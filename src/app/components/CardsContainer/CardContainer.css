@@ -1,0 +1,128 @@
+:root { 
+    --card-width: clamp(300px, 50vmin, 600px);
+}
+
+.track {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+ul {
+    display: flex;
+    flex-direction: column; /* تغيير الاتجاه إلى عمودي */
+    gap: 1rem;
+    padding: 0;
+    margin: 0;
+    scroll-snap-type: y mandatory; /* تغيير النوع إلى عمودي */
+    scroll-snap-stop: always;
+    list-style-type: none;
+    overflow-y: auto; /* ضبط التمرير ليكون عموديًا */
+    height: 100%;
+    align-items: center;
+    scroll-behavior: smooth;
+}
+
+li {
+    scroll-snap-align: center;
+    padding: 0;
+    margin: 0;
+}
+
+:is(li, .indicator):nth-of-type(1) { --hue: 0; }
+:is(li, .indicator):nth-of-type(2) { --hue: 140; }
+:is(li, .indicator):nth-of-type(3) { --hue: 45; }
+:is(li, .indicator):nth-of-type(4) { --hue: 200; }
+:is(li, .indicator):nth-of-type(5) { --hue: 320; }
+
+article {
+    width: var(--card-width);
+    aspect-ratio: 4 / 3;
+    background: 
+        linear-gradient(to bottom right, rgba(255, 255, 255, 0.65), rgba(0, 0, 0, 0.25)) fixed,
+        linear-gradient(hsl(var(--hue) 100% 0% / 0.25), transparent),
+        linear-gradient(transparent, hsl(var(--hue) 0% 10% / 0.5));
+    box-shadow:
+        0 1px rgba(255, 255, 255, 0.5) inset,
+        0 10px 20px -10px black;
+    border-radius: 1rem;
+    border-top: 2px solid hsla(var(--hue, 10) 80% 60% / 0.75);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.scrollbox {
+    overflow: auto;
+    max-height: 100%;
+    width: 100%;
+    padding: 1rem;
+}
+
+.content {
+    color: white;
+    text-align: center;
+    font-size: 1.2rem;
+    text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.track__indicators {
+    width: 20px; /* جعل المؤشرات عمودية */
+    position: absolute;
+    top: 50%;
+    left: calc(50% + ((var(--card-width) * (3 / 4)) * 0.5) + 2rem);
+    transform: translate(0, -50%);
+    display: flex;
+    flex-direction: column;
+}
+
+.indicator {
+    --color: hsl(var(--hue, 0) 0% 86%);
+    background: linear-gradient(var(--color), var(--color)) padding-box;
+    flex: 1;
+    border-radius: 100px;
+    height: 20px; /* ضبط ارتفاع المؤشر */
+    min-width: 20px;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    border: 4px solid transparent;
+}
+
+.indicator::after {
+    content: "";
+    border-radius: 100px;
+    position: absolute;
+    inset: 0;
+    background: hsl(var(--hue) 90% 70%);
+}
+
+body::before {
+    --line: hsl(0 0% 95% / 0.15);
+    content: "";
+    height: 100vh;
+    width: 100vw;
+    position: fixed;
+    background:
+        linear-gradient(90deg, var(--line) 1px, transparent 1px 10vmin) 0 -5vmin / 10vmin 10vmin,
+        linear-gradient(var(--line) 1px, transparent 1px 10vmin) 0 -5vmin / 10vmin 10vmin;
+    mask: linear-gradient(-15deg, transparent 30%, white);
+    top: 0;
+    z-index: -1;
+    transform: translate3d(0, 0, -100vmin);
+}
+
+@media (max-width: 600px) {
+    :root {
+        --card-width: clamp(250px, 45vmin, 400px);
+    }
+    ul {
+        gap: 1rem;
+        padding-inline: calc(50vw - (var(--card-width) * 0.5));
+        scroll-padding-inline: calc(50vw - (var(--card-width) * 0.5));
+    }
+
+    article {
+        box-shadow: 0 5px 10px -5px black;
+    }
+}
