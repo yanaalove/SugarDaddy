@@ -27,7 +27,7 @@
 
 # IndexedDB
 src/lib/db.js
-src/lib/level.ts
+src/lib/levels.ts
 
 # Redux store
 /src/store/miningSlice.ts
