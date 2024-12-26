@@ -23,14 +23,16 @@
 # Prisma
 /prisma/*.db
 /prisma/migrations/
+/prisma/schema.prisma
 
 # IndexedDB
 /lib/db.js
 /lib/level.ts
 
 # Redux store
-/store/miningSlice.ts
-/store/store.ts
+/src/store/miningSlice.ts
+/src/store/store.ts
+
 # debug
 npm-debug.log*
 yarn-debug.log*
@@ -47,3 +49,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
