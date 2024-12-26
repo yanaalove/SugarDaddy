@@ -26,8 +26,8 @@
 /prisma/schema.prisma
 
 # IndexedDB
-/lib/db.js
-/lib/level.ts
+src/lib/db.js
+src/lib/level.ts
 
 # Redux store
 /src/store/miningSlice.ts
