@@ -22,8 +22,7 @@
 
 # Prisma
 /prisma/*.db
-/prisma/migrations/
-/prisma/schema.prisma
+
 
 # IndexedDB
 src/lib/db.js
