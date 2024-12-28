@@ -3,9 +3,8 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 
-// تحميل ReferralCard بشكل ديناميكي
 const ReferralCard = dynamic(() => import('../components/ReferralCard/ReferralCard'), {
-  ssr: false, // تحميل في العميل فقط
+  ssr: false,
 });
 
 const ReferralPage: React.FC = () => {
@@ -13,7 +12,7 @@ const ReferralPage: React.FC = () => {
 
   const handleSetUserId = (id: string) => {
     if (id) {
-      setUserId(id); // تخزين userId عند استدعائه من ReferralCard
+      setUserId(id);
     }
   };
 
@@ -27,3 +26,4 @@ const ReferralPage: React.FC = () => {
 };
 
 export default ReferralPage;
+

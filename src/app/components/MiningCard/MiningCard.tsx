@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback, memo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import Bike from '../Bike/Bike'
-import { levels } from '../../../lib/levels'
+import { levels,  Level  } from '../../../lib/levels'
 import {
   updateBalanceInIndexedDB,
   getBalanceFromIndexedDB,
@@ -98,18 +98,18 @@ const MiningCard: React.FC<MiningCardProps> = memo(({ userId }) => {
         }))
       }
     }, [sessionActive, timeLeft, startTimeUTC, balance, userLevel, sessionCompleted, pointsToCollect])
-  
+    
     const handleStartSession = () => {
-      if (!userId) {
-        alert('Please log in to start mining.')
-        return
+        if (!userId) {
+          alert('Please log in to start mining.')
+          return
+        }
+        const level: Level = levels[userLevel]
+        const sessionDuration = level.isDurationInHours ? level.duration * 3600 : level.duration * 60
+        const startTime = new Date().toUTCString()
+  
+        dispatch(startSession({ duration: sessionDuration, startTime }))
       }
-      const level = levels[userLevel]
-      const sessionDuration = level.isDurationInHours ? level.duration * 3600 : level.duration * 60
-      const startTime = new Date().toUTCString()
-
-      dispatch(startSession({ duration: sessionDuration, startTime }))
-    }
   
     const handleCollectPoints = async () => {
         console.log("User ID:", userId);

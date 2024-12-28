@@ -1,40 +1,30 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import prisma from '../../../lip/prisma';
 
-export async function GET(request) {
+async function findUser(user_id: string): Promise<{ user: any; table: string } | null> {
+  try {
+    const user = await prisma.user.findUnique({ where: { user_id } });
+    if (user) return { user, table: "User" };
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export async function GET(request: NextRequest) {
   const userId = request.nextUrl.searchParams.get('userId');
   if (!userId) {
     return NextResponse.json({ error: 'User ID is required' }, { status: 400 });
   }
 
   try {
-    const user = await prisma.user.findUnique({
-      where: { user_id: userId },
-      select: { completedTasks: true }
-    });
-
-    if (!user) {
-      const secondaryUser = await prisma.secondaryUser.findUnique({
-        where: { user_id: userId },
-        select: { completedTasks: true }
-      });
-
-      if (!secondaryUser) {
-        const tertiaryUser = await prisma.tertiaryUser.findUnique({
-          where: { user_id: userId },
-          select: { completedTasks: true }
-        });
-
-        if (!tertiaryUser) {
-          return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
-
-        return NextResponse.json({ completedTasks: tertiaryUser.completedTasks });
-      }
-
-      return NextResponse.json({ completedTasks: secondaryUser.completedTasks });
+    const result = await findUser(userId);
+    if (!result) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
+    const { user } = result;
     return NextResponse.json({ completedTasks: user.completedTasks });
   } catch (error) {
     console.error('Error fetching tasks:', error);
@@ -42,39 +32,28 @@ export async function GET(request) {
   }
 }
 
-export async function POST(request) {
+export async function POST(request: NextRequest) {
   const { userId, taskId } = await request.json();
   if (!userId || !taskId) {
     return NextResponse.json({ error: 'User ID and Task ID are required' }, { status: 400 });
   }
 
   try {
-    const updateUser = async (model) => {
-      const user = await model.findUnique({
-        where: { user_id: userId },
-        select: { completedTasks: true }
-      });
-
-      if (!user) return null;
-
-      const completedTasks = user.completedTasks ? user.completedTasks.split('-') : [];
-      if (!completedTasks.includes(taskId)) {
-        completedTasks.push(taskId);
-      }
-
-      return await model.update({
-        where: { user_id: userId },
-        data: { completedTasks: completedTasks.join('-') }
-      });
-    };
-
-    let updatedUser = await updateUser(prisma.user);
-    if (!updatedUser) updatedUser = await updateUser(prisma.secondaryUser);
-    if (!updatedUser) updatedUser = await updateUser(prisma.tertiaryUser);
-
-    if (!updatedUser) {
+    const result = await findUser(userId);
+    if (!result) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
+
+    const { user } = result;
+    const completedTasks = user.completedTasks ? user.completedTasks.split('-') : [];
+    if (!completedTasks.includes(taskId)) {
+      completedTasks.push(taskId);
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { user_id: userId },
+      data: { completedTasks: completedTasks.join('-') }
+    });
 
     return NextResponse.json({ completedTasks: updatedUser.completedTasks });
   } catch (error) {

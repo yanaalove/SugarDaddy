@@ -8,7 +8,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint --fix ",
     "start:bot": "node  src/bot/index.js"
   },
   "dependencies": {
@@ -47,8 +47,8 @@
     "@types/ws": "^8.5.12",
     "@typescript-eslint/eslint-plugin": "^8.16.0",
     "@typescript-eslint/parser": "^8.16.0",
-    "eslint": "^9.15.0",
-    "eslint-config-next": "^15.0.3",
+    "eslint": "^9.17.0",
+    "eslint-config-next": "^15.1.3",
     "postcss": "^8",
     "prisma": "^6.1.0",
     "tailwindcss": "^3.4.14",

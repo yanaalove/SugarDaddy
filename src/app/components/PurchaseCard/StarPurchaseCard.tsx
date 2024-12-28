@@ -5,13 +5,14 @@ import {
   useTonConnectUI,
   useTonWallet,
 } from "@tonconnect/ui-react";
-import { Loader2 } from "lucide-react";
+import { Loader2 } from 'lucide-react';
 import { beginCell, toNano, Address } from "@ton/core";
 import Eyes from "./Eyes";
 import {
   updateLevelInIndexedDB,
   getLevelFromIndexedDB,
 } from "../../../lib/db";
+import { Level, levels } from "../../../lib/levels";
 
 interface StarPurchaseCardProps {
   userId: string | null;
@@ -19,11 +20,7 @@ interface StarPurchaseCardProps {
 
 const StarPurchaseCard: React.FC<StarPurchaseCardProps> = memo(
   ({ userId }) => {
-    const levels = [
-      { id: 1, title: "LV1", sugD: 1, hours: 7, price: 2.5, percentage: "30%" },
-      { id: 2, title: "LV2", sugD: 2, hours: 10, price: 5, percentage: "50%" },
-      { id: 3, title: "LV3", sugD: 3, hours: 30, price: 20, percentage: "100%" },
-    ];
+    const levelsArray = Object.values(levels);
 
     const wallet = useTonWallet();
     const [tonConnectUI] = useTonConnectUI();
@@ -48,7 +45,7 @@ const StarPurchaseCard: React.FC<StarPurchaseCardProps> = memo(
       }
     }, [userId]);
 
-    const createTransactionPayload = (level) => {
+    const createTransactionPayload = (level: Level) => {
       const body = beginCell()
         .storeUint(0x12345678, 32)
         .storeUint(level.id, 8)
@@ -62,7 +59,7 @@ const StarPurchaseCard: React.FC<StarPurchaseCardProps> = memo(
       return body.toBoc().toString("base64");
     };
 
-    const sendTransaction = async (level) => {
+    const sendTransaction = async (level: Level) => {
       if (!wallet) {
         setError("Please connect your wallet first.");
         return;
@@ -122,11 +119,9 @@ const StarPurchaseCard: React.FC<StarPurchaseCardProps> = memo(
 
         <TonConnectButton className="mb-1" />
 
-        <div className="text-sm  font-mono text-green-500 mt-2">
-  We support payments with <span className="font-bold">Tonkeeper</span>!
-</div>
-
-
+        <div className="text-sm font-mono text-green-500 mt-2">
+          We support payments with <span className="font-bold">Tonkeeper</span>!
+        </div>
 
         {error && (
           <div className="bg-red-500/10 border border-red-500 text-red-500 p-4 rounded-lg mb-4 text-center">
@@ -135,11 +130,11 @@ const StarPurchaseCard: React.FC<StarPurchaseCardProps> = memo(
         )}
 
         <div className="w-full">
-          {levels.map((level) => (
+          {levelsArray.map((level) => (
             <div key={level.id} className="flex flex-col items-start w-full mb-4">
               <div className="text-cyan-400 font-mono mb-2 flex items-center justify-between w-full">
                 <div>
-                  {level.title}: {level.sugD}:sugD/H | {level.hours}:Hours | {level.price} TON
+                  {level.title}: {level.SugD}:sugD/H | {level.hours}:Hours | {level.price} TON
                 </div>
                 <div className="text-sm text-green-500">
                   Earns: {level.percentage} of mined points
@@ -175,3 +170,4 @@ const StarPurchaseCard: React.FC<StarPurchaseCardProps> = memo(
 
 StarPurchaseCard.displayName = "StarPurchaseCard";
 export default StarPurchaseCard;
+

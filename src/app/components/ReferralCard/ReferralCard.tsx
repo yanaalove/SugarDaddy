@@ -1,32 +1,44 @@
 import { useEffect, useState, memo, useCallback } from "react";
 import Image from "next/image";
-import db from "../../../lib/db";  // استيراد Dexie.js DB
+import db from "../../../lib/db";
 
-const ReferralCard = memo(({ onSetUserId }) => {
-  const [telegramData, setTelegramData] = useState(null);
+interface ReferralCardProps {
+  onSetUserId?: (userId: string) => void;
+}
+
+interface UserData {
+  id: string;
+  username: string;
+}
+
+interface TelegramData {
+  id: number;
+  username: string;
+}
+
+const ReferralCard = memo(({ onSetUserId }: ReferralCardProps) => {
+  const [telegramData, setTelegramData] = useState<TelegramData | null>(null);
   const [inviteLink, setInviteLink] = useState("");
   const [hasCheckedUser, setHasCheckedUser] = useState(false);
 
   const INVITE_URL = "https://t.me/SugarD_Bot/SugarApp";
   const sets = ["set1", "set2", "set3", "set4"];
-  const [selectedSet, setSelectedSet] = useState(null);
+  const [selectedSet, setSelectedSet] = useState<string | null>(null);
 
-  const generateReferralCode = (userId) => `REF-${userId}`;
+  const generateReferralCode = (userId: string): string => `REF-${userId}`;
 
-  // دالة لمزامنة البيانات مع IndexedDB
-  const syncWithIndexedDB = useCallback(async (userData) => {
-    const storedUser = await db.users.get(userData.id.toString());
+  const syncWithIndexedDB = useCallback(async (userData: UserData) => {
+    const storedUser = await db.table("users").get(userData.id);
     if (storedUser) {
       console.log("User data already synced with IndexedDB.");
       return;
     }
 
     try {
-      // تخزين البيانات في IndexedDB
-      await db.users.put({
-        user_id: userData.id.toString(),
+      await db.table("users").put({
+        user_id: userData.id,
         username: userData.username,
-        referralCode: generateReferralCode(userData.id.toString()),
+        referralCode: generateReferralCode(userData.id),
       });
       console.log("User data synced with IndexedDB.");
     } catch (error) {
@@ -38,22 +50,31 @@ const ReferralCard = memo(({ onSetUserId }) => {
     async (retries = 3) => {
       if (window.Telegram && window.Telegram.WebApp) {
         const tg = window.Telegram.WebApp;
-        const userData = tg.initDataUnsafe?.user;
+        const rawUserData = tg.initDataUnsafe?.user;
 
-        if (userData && !hasCheckedUser) {
-          setTelegramData(userData);
-          const referralCode = generateReferralCode(userData.id.toString());
+        if (rawUserData && !hasCheckedUser) {
+          const userData: UserData = {
+            id: rawUserData.id.toString(),
+            username: rawUserData.username || '',
+          };
+          setTelegramData({
+            id: rawUserData.id,
+            username: rawUserData.username || '',
+          });
+          const referralCode = generateReferralCode(userData.id);
           setInviteLink(`${INVITE_URL}?startapp=${referralCode}`);
           setSelectedSet(sets[Math.floor(Math.random() * sets.length)]);
           await syncWithIndexedDB(userData);
           setHasCheckedUser(true);
-          onSetUserId(userData.id.toString()); // تمرير user_id إلى CardContainer
+          if (onSetUserId) {
+            onSetUserId(userData.id);
+          }
         }
       } else if (retries > 0) {
         setTimeout(() => checkTelegramWebApp(retries - 1), 500);
       }
     },
-    [hasCheckedUser, syncWithIndexedDB, onSetUserId]
+    [hasCheckedUser, syncWithIndexedDB, onSetUserId, sets]
   );
 
   useEffect(() => {
@@ -62,7 +83,6 @@ const ReferralCard = memo(({ onSetUserId }) => {
     }
   }, [hasCheckedUser, checkTelegramWebApp]);
 
-  // Ensure the handleInviteFriend function is defined properly
   const handleInviteFriend = useCallback(() => {
     if (!inviteLink) return;
 
@@ -96,7 +116,7 @@ const ReferralCard = memo(({ onSetUserId }) => {
         {telegramData.username && (
           <>
             <Image
-              src={`https://robohash.org/${telegramData.username}?set=${selectedSet}&size=200x200`}
+              src={`https://robohash.org/${telegramData.username}?set=${selectedSet || 'set1'}&size=200x200`}
               className="user-photo h-24 w-24 mb-1"
               alt="User RoboHash"
               width={200}
@@ -128,4 +148,7 @@ const ReferralCard = memo(({ onSetUserId }) => {
   );
 });
 
+ReferralCard.displayName = "ReferralCard";
+
 export default ReferralCard;
+

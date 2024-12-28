@@ -13,13 +13,17 @@ export default function SocialPage() {
 
   useEffect(() => {
     const fetchUserId = async () => {
-      const users = await db.users.toArray();
-      if (users.length > 0) {
-        setUserId(users[0].user_id);
-      }
+        try {
+            const users = await db.table('users').toArray();
+            if (users.length > 0) {
+                setUserId(users[0].user_id);
+            }
+        } catch (error) {
+            console.error("Error fetching user:", error);
+        }
     };
     fetchUserId();
-  }, []);
+}, []);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 pb-20">

@@ -15,13 +15,17 @@ const MiningPage: React.FC = () => {
 
   useEffect(() => {
     const fetchUserId = async () => {
-      const users = await db.users.toArray()
-      if (users.length > 0) {
-        setUserId(users[0].user_id)
-      }
-    }
-    fetchUserId()
-  }, [])
+        try {
+            const users = await db.table('users').toArray();
+            if (users.length > 0) {
+                setUserId(users[0].user_id);
+            }
+        } catch (error) {
+            console.error("Error fetching user:", error);
+        }
+    };
+    fetchUserId();
+}, []);
 
 
   return (
