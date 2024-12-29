@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "module": "commonjs",
+  
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --fix ",
+    "lint": "next lint ",
     "start:bot": "node  src/bot/index.js"
   },
   "dependencies": {
