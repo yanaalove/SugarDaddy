@@ -24,14 +24,6 @@
 /prisma/*.db
 
 
-# IndexedDB
-src/lib/db.js
-src/lib/levels.ts
-
-# Redux store
-/src/store/miningSlice.ts
-/src/store/store.ts
-
 # debug
 npm-debug.log*
 yarn-debug.log*
