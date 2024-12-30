@@ -1,4 +1,4 @@
-import { useEffect, useState, memo, useCallback } from "react";
+import { useEffect, useState, memo, useCallback, useMemo } from "react";
 import Image from "next/image";
 import db from "../../../lib/db";
 
@@ -22,7 +22,7 @@ const ReferralCard = memo(({ onSetUserId }: ReferralCardProps) => {
   const [hasCheckedUser, setHasCheckedUser] = useState(false);
 
   const INVITE_URL = "https://t.me/SugarD_Bot/SugarApp";
-  const sets = ["set1", "set2", "set3", "set4"];
+  const sets = useMemo(() => ["set1", "set2", "set3", "set4"], []);
   const [selectedSet, setSelectedSet] = useState<string | null>(null);
 
   const generateReferralCode = (userId: string): string => `REF-${userId}`;

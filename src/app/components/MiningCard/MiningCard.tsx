@@ -212,6 +212,8 @@ const MiningCard: React.FC<MiningCardProps> = memo(({ userId }) => {
       </div>
     )
 })
+MiningCard.displayName = 'MiningCard'
+
   
 export default MiningCard
 
